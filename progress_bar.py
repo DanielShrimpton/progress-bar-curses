@@ -1,9 +1,19 @@
 import curses
 
 
-class Window:
-    def __init__(self, lines, cols, y_pos, x_pos):
-        self.window = curses.newwin(lines, cols, y_pos, x_pos)
+class ProgressBar:
+    def __init__(self, n, padding=0):
+        """
+        The init function for the ProgressBar setting up the window and size.
+        :param n: The n-th progress bar, if you want multiple progress bars, this will rise it up n
+        lines.
+        :param padding: If padding is wanted around the progress bar for some reason, will pad
+        the progress bar with `padding` columns either side of the progress bar.
+        """
+        y_pos = MAX_ROWS - n
+        x_pos = 0 + padding
+        cols = MAX_COLS - 2 * padding
+        self.window = curses.newwin(1, cols, y_pos, x_pos)
 
     def print(self, message):
         self.window.addstr(message)
@@ -20,19 +30,19 @@ class Pad:
         self.row += 1
         if self.row >= self.size:
             self.size += 10
-            self.pad.resize(self.size, max_cols)
+            self.pad.resize(self.size, MAX_COLS)
         self.pad.addstr(message)
-        if self.row >= max_rows - 1:
-            self.pad.refresh(self.row - (max_rows - 1), 0, 0, 0, max_rows-2, max_cols - 1)
+        if self.row >= MAX_ROWS - 1:
+            self.pad.refresh(self.row - (MAX_ROWS - 1), 0, 0, 0, MAX_ROWS - 2, MAX_COLS - 1)
         else:
-            self.pad.refresh(0, 0, 0, 0, max_rows-2, max_cols-1)
+            self.pad.refresh(0, 0, 0, 0, MAX_ROWS - 2, MAX_COLS - 1)
 
 
 screen = curses.initscr()
-max_rows, max_cols = screen.getmaxyx()
-bar = Window(1, max_cols, max_rows - 1, 0)
+MAX_ROWS, MAX_COLS = screen.getmaxyx()
+bar = ProgressBar(1)
 
-rest = Pad(max_rows - 1, max_cols)
+rest = Pad(MAX_ROWS - 1, MAX_COLS)
 bar.print("[===>         ]")
 
 for i in range(25):
